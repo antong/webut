@@ -1,0 +1,64 @@
+from zope.interface import implements
+from twisted.internet import defer
+from nevow import inevow, url
+from webut.skin import iskin
+
+class Skinner(object):
+    implements(inevow.IResource, iskin.ISkinInfo)
+
+    pathToFiles = None
+
+    def __init__(self,
+                 skinFactory,
+                 content,
+                 pathToFiles=None):
+        self.skinFactory = skinFactory
+        self.content = content
+        if pathToFiles is not None:
+            self.pathToFiles = pathToFiles
+
+    def _undefer_locateChild(self, result):
+        """
+        locateChild can return Deferred or (d, segs), handle the latter.
+        """
+        res, segs = result
+        if isinstance(res, defer.Deferred):
+            def cb(res, segs):
+                return (res, segs)
+            res.addCallback(cb, segs)
+            return res
+        else:
+            return (res, segs)
+
+    def locateChild(self, ctx, segments):
+        d = defer.maybeDeferred(inevow.IResource(self.content).locateChild, ctx, segments)
+        d.addCallback(self._undefer_locateChild)
+        d.addCallback(self._cb_locateChild_1, ctx, segments)
+        return d
+
+    def _cb_locateChild_1(self, result, ctx, segments):
+        res, segs = result
+        if res is None:
+            return (res, segs)
+
+        pathToFiles = self.pathToFiles
+        if pathToFiles is None:
+            pathToFiles = url.URL.fromContext(ctx).clear()
+            # the url will actually point to the child we are
+            # locating, so let's redo it to point here
+            for seg in segments:
+                pathToFiles = pathToFiles.up()
+        res = self.__class__(skinFactory=self.skinFactory,
+                             content=res,
+                             pathToFiles=pathToFiles)
+        return (res, segs)
+
+    def renderHTTP(self, ctx):
+        if self.pathToFiles is None:
+            self.pathToFiles = url.URL.fromContext(ctx).clear()
+        skinnable = iskin.ISkinnable(self.content, None)
+        if skinnable is None:
+            return self.content.renderHTTP(ctx)
+        else:
+            skin = self.skinFactory(self)
+            return skin.renderHTTP(ctx)
