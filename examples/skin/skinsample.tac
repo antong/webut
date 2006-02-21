@@ -16,14 +16,14 @@ class Content(rend.Page):
     def render_cruelity(self, ctx, data):
         return ctx.tag.clear()[random.choice(['Cruel', 'Sweet', ''])]
 
-class Blue(rend.Page):
-    docFactory = loaders.xmlfile(util.sibpath(__file__, 'blue-skin.html'))
+class Color(rend.Page):
+    docFactory = loaders.xmlfile(util.sibpath(__file__, 'color-skin.html'))
 
     def data_title(self, ctx, data):
         return self.original.content.title
 
     def render_background(self, ctx, data):
-        return ctx.tag(style='background-color: #0000%02x;' % random.randint(128,255))
+        return ctx.tag(style='background-color: #00%02x00;' % random.randint(128,255))
 
     def render_content(self, ctx, data):
         return self.original.content
@@ -39,7 +39,7 @@ class Boxed(rend.Page):
 
 
 content = Content()
-root = skin.Skinner(Blue, content)
+root = skin.Skinner(Color, content)
 ## root = skin.Skinner(Boxed, content)
 
 application = service.Application("skinsample")
