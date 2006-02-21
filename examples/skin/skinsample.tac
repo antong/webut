@@ -23,7 +23,8 @@ class Color(rend.Page):
         return self.original.content.title
 
     def render_background(self, ctx, data):
-        return ctx.tag(style='background-color: #00%02x00;' % random.randint(128,255))
+        return ctx.tag(style='color: white; background-color: #00%02x00;'
+                       % random.randint(128,255))
 
     def render_content(self, ctx, data):
         return self.original.content
