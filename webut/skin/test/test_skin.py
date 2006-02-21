@@ -17,7 +17,7 @@ class FakeRequest(object):
         self.uri = (self.prePathURL() + '/junk/junk/junk?junk=remove')
 
     def prePathURL(self):
-        return 'http://fake.invalid/%s?junk=remove' % '/'.join(self.segments)
+        return 'http://fake.invalid/?junk=prepathjunk'
 
 class Xyzzy(object):
     implements(iskin.ISkinnable, inevow.IRenderer)
@@ -101,6 +101,7 @@ class SkinTest(unittest.TestCase):
     def locate(self, resource, segments, ctx=None):
         if ctx is None:
             ctx = self.context(resource, segments)
+            ctx.remember((), inevow.ICurrentSegments)
         resource = inevow.IResource(resource)
         if segments:
             segments = tuple(segments)
@@ -110,6 +111,10 @@ class SkinTest(unittest.TestCase):
             d = defer.succeed((resource, []))
         def cb(result):
             resource, segs = result
+
+            prepath = list(inevow.ICurrentSegments(ctx))
+            prepath.extend(segments[: len(segments) - len(segs)])
+            ctx.remember(tuple(prepath), inevow.ICurrentSegments)
             if resource is None:
                 assert not segs
                 return (None, ctx)

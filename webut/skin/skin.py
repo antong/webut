@@ -44,10 +44,8 @@ class Skinner(object):
         pathToFiles = self.pathToFiles
         if pathToFiles is None:
             pathToFiles = url.URL.fromContext(ctx).clear()
-            # the url will actually point to the child we are
-            # locating, so let's redo it to point here
-            for seg in segments:
-                pathToFiles = pathToFiles.up()
+            for seg in inevow.ICurrentSegments(ctx):
+                pathToFiles = pathToFiles.child(seg)
         res = self.__class__(skinFactory=self.skinFactory,
                              content=res,
                              pathToFiles=pathToFiles)
@@ -55,7 +53,10 @@ class Skinner(object):
 
     def renderHTTP(self, ctx):
         if self.pathToFiles is None:
-            self.pathToFiles = url.URL.fromContext(ctx).clear()
+            pathToFiles = url.URL.fromContext(ctx).clear()
+            for seg in inevow.ICurrentSegments(ctx):
+                pathToFiles = pathToFiles.child(seg)
+            self.pathToFiles = pathToFiles
         skinnable = iskin.ISkinnable(self.content, None)
         if skinnable is None:
             return self.content.renderHTTP(ctx)
