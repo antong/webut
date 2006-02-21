@@ -2,7 +2,7 @@ from zope.interface import implements
 import random
 from twisted.application import service, strports
 from twisted.python import util
-from nevow import appserver, loaders, rend
+from nevow import appserver, loaders, rend, inevow, url
 from webut.skin import iskin, skin
 
 class Content(rend.Page):
@@ -38,10 +38,22 @@ class Boxed(rend.Page):
         return self.original.content
 
 
-content = Content()
-root = skin.Skinner(Color, content)
-## root = skin.Skinner(Boxed, content)
+class Root(object):
+    implements(inevow.IResource)
+    def renderHTTP(self, ctx):
+        return url.here.child('color')
+    def locateChild(self, ctx, segments):
+        content = Content()
+        if segments[0] == '':
+            return self, segments[1:]
+        elif segments[0] == 'color':
+            return skin.Skinner(Color, content), segments[1:]
+        elif segments[0] == 'boxed':
+            return skin.Skinner(Boxed, content), segments[1:]
+        else:
+            return None, ()
 
+root = Root()
 application = service.Application("skinsample")
 site = appserver.NevowSite(root)
 svc = strports.service("8080", site)
