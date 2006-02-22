@@ -39,6 +39,7 @@ class ManyXyzzys(object):
     implements(iskin.ISkinnable, inevow.IRenderer)
 
     def __init__(self, _name=None):
+        super(ManyXyzzys, self).__init__()
         self.name = _name
         if self.name is None:
             self.name = 'topmost'
