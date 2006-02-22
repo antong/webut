@@ -1,6 +1,7 @@
 from zope.interface import implements
 from twisted.internet import defer
-from nevow import inevow, url
+from nevow import inevow, url, tags
+from nevow.flat.twist import deferflatten
 from webut.skin import iskin
 
 class Skinner(object):
@@ -58,10 +59,24 @@ class Skinner(object):
                 pathToFiles = pathToFiles.child(seg)
             self.pathToFiles = pathToFiles
         skinnable = iskin.ISkinnable(self.resource, None)
-        if skinnable is None:
-            return self.resource.renderHTTP(ctx)
-        else:
+        if skinnable is not None:
             skin = self.skinFactory(self)
             assert iskin.ISkin.providedBy(skin), \
                    "Skin %r does not provide ISkin" % skin
-            return skin.renderHTTP(ctx)
+            origRenderer = self.resource.renderer
+            def render_skin(ctx, data):
+                content = inevow.IQ(ctx.tag).onePattern('skincontent')
+                gather = tags.invisible()
+                d = deferflatten(content, ctx, gather.__getitem__)
+                def gotContent(s):
+                    self.content = gather
+                    return skin
+                d.addCallback(gotContent)
+                return d
+            def renderer(ctx, name):
+                if name == 'skin':
+                    return render_skin
+                else:
+                    return origRenderer(ctx, name)
+            self.resource.renderer = renderer
+        return inevow.IResource(self.resource).renderHTTP(ctx)

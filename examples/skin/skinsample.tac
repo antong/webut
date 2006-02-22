@@ -8,15 +8,14 @@ from webut.skin import iskin, skin
 class Content(rend.Page):
     implements(iskin.ISkinnable)
     addSlash = True
-    docFactory = loaders.xmlfile(util.sibpath(__file__, 'content.html'),
-                                 pattern='skincontent')
+    docFactory = loaders.xmlfile(util.sibpath(__file__, 'content.html'))
 
     title = 'Greeting'
 
     def render_cruelity(self, ctx, data):
         return ctx.tag.clear()[random.choice(['Cruel', 'Sweet', ''])]
 
-class Color(rend.Page):
+class Color(rend.Fragment):
     implements(iskin.ISkin)
     docFactory = loaders.xmlfile(util.sibpath(__file__, 'color-skin.html'))
 
@@ -28,9 +27,9 @@ class Color(rend.Page):
                        % random.randint(128,255))
 
     def render_content(self, ctx, data):
-        return self.original.resource
+        return self.original.content
 
-class Boxed(rend.Page):
+class Boxed(rend.Fragment):
     implements(iskin.ISkin)
     docFactory = loaders.xmlfile(util.sibpath(__file__, 'boxed-skin.html'))
 
@@ -38,7 +37,7 @@ class Boxed(rend.Page):
         return self.original.resource.title
 
     def render_content(self, ctx, data):
-        return self.original.resource
+        return self.original.content
 
 
 class Root(object):

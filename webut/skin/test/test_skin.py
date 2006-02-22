@@ -2,21 +2,22 @@ from twisted.trial import unittest
 from zope.interface import implements
 from cStringIO import StringIO
 from twisted.internet import defer
-from nevow import inevow, tags, flat, context
+from nevow import inevow, tags, flat, context, rend, loaders
 from webut.skin import iskin, skin
 
 class Skin(object):
     implements(iskin.ISkin)
     def __init__(self, original):
         self.original = original
-    def renderHTTP(self, ctx):
-        return tags.invisible['[skin]', self.original.resource, '[/skin]']
+    def rend(self, ctx, data):
+        return tags.invisible['[skin]', self.original.content, '[/skin]']
 
 class FakeRequest(object):
     def __init__(self, segments):
         self.segments = segments
         self.uri = (self.prePathURL() + '/junk/junk/junk?junk=remove')
         self._written = []
+        self.args = {}
 
     def prePathURL(self):
         return 'http://fake.invalid/?junk=prepathjunk'
@@ -24,20 +25,29 @@ class FakeRequest(object):
     def write(self, data):
         self._written.append(data)
 
-class Xyzzy(object):
-    implements(iskin.ISkinnable, inevow.IRenderer)
+class Xyzzy(rend.Page):
+    implements(iskin.ISkinnable)
 
-    def rend(self, ctx, data):
-        return 'xyzzy'
+    docFactory = loaders.stan(tags.invisible(render=tags.directive('skin'))[
+        tags.invisible(pattern='skincontent')['xyzzy'],
+        ])
 
-class DeferredXyzzy(object):
-    implements(iskin.ISkinnable, inevow.IRenderer)
+class DeferredXyzzy(rend.Page):
+    implements(iskin.ISkinnable)
 
-    def rend(self, ctx, data):
+    docFactory = loaders.stan(tags.invisible(render=tags.directive('skin'))[
+        tags.invisible(pattern='skincontent', render=tags.directive('foo')),
+        ])
+
+    def render_foo(self, ctx, data):
         return defer.succeed('dyddy')
 
-class ManyXyzzys(object):
-    implements(iskin.ISkinnable, inevow.IRenderer)
+class ManyXyzzys(rend.Page):
+    implements(iskin.ISkinnable)
+
+    docFactory = loaders.stan(tags.invisible(render=tags.directive('skin'))[
+        tags.invisible(pattern='skincontent', render=tags.directive('name')),
+        ])
 
     def __init__(self, _name=None):
         super(ManyXyzzys, self).__init__()
@@ -45,7 +55,7 @@ class ManyXyzzys(object):
         if self.name is None:
             self.name = 'topmost'
 
-    def rend(self, ctx, data):
+    def render_name(self, ctx, data):
         return self.name
 
     def locateChild(self, ctx, segments):
@@ -65,12 +75,12 @@ class AuxFileSkin(object):
     implements(iskin.ISkin)
     def __init__(self, original):
         self.original = original
-    def renderHTTP(self, ctx):
-        return tags.invisible[
+    def rend(self, ctx, data):
+        return loaders.stan(tags.invisible[
             '[skin css=', self.original.pathToFiles.child('test.css'), ']',
-            self.original.resource,
+            self.original.content,
             '[/skin]',
-            ]
+            ])
 
 class SkinTest(unittest.TestCase):
     def flatten(self, stan, ctx):

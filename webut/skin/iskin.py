@@ -1,18 +1,23 @@
 from zope.interface import Interface, Attribute
 from nevow import inevow
 
-class ISkinnable(inevow.IResource, inevow.IRenderer):
+class ISkinnable(inevow.IResource, inevow.IRendererFactory):
     """
     A skinnable web resource.
 
-    Note that ISkinnable's must implement IRenderer too. Fragment and
-    Page already do this, but if you implement IResource from scratch,
-    be sure to add that.
+    The topmost HTML element must render itself with the renderer
+    'skin'. The renderer method of ISkinnable will be overridden to
+    handle the 'skin' renderer properly.
 
-    IRenderer.rend should return the resource's content, without the
-    <html>, <head> or <body> elements, from the renderer
-    'content'. There are additional attributes for better integration
-    into navigational elements.
+    The resource's content, without the <html>, <head> or <body>
+    elements, must be marked with the template 'skincontent'.
+
+    The same ISkinnable must not be rendered twice, use a new instance
+    instead. (There is a race condition in case the same instance is
+    rendered simultaneusly.)
+
+    There are additional attributes for better integration into
+    navigational elements.
     """
 
     title = Attribute("""
@@ -25,7 +30,7 @@ class ISkinnable(inevow.IResource, inevow.IRenderer):
     Sequence of filenames to include as CSS stylesheets.
     """)
 
-class ISkin(inevow.IResource):
+class ISkin(inevow.IRenderer):
     """
     A skin that knows how to wrap generic chunks of HTML.
     """
@@ -36,6 +41,8 @@ class ISkinInfo(Interface):
     """
 
     resource = Attribute("""An ISkinnable to be skinned.""")
+
+    content = Attribute("""Flattened stan to be embedded in the page.""")
 
     pathToFiles = Attribute("""
     A nevow.url.URL that points to the topmost instance of this skin.
