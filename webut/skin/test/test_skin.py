@@ -15,9 +15,13 @@ class FakeRequest(object):
     def __init__(self, segments):
         self.segments = segments
         self.uri = (self.prePathURL() + '/junk/junk/junk?junk=remove')
+        self._written = []
 
     def prePathURL(self):
         return 'http://fake.invalid/?junk=prepathjunk'
+
+    def write(self, data):
+        self._written.append(data)
 
 class Xyzzy(object):
     implements(iskin.ISkinnable, inevow.IRenderer)
@@ -83,6 +87,9 @@ class SkinTest(unittest.TestCase):
     def render(self, resource, ctx):
         d = defer.maybeDeferred(resource.renderHTTP, ctx)
         d.addCallback(self.flatten, ctx)
+        def join(data, ctx):
+            return ''.join(inevow.IRequest(ctx)._written + [data])
+        d.addCallback(join, ctx)
         return d
 
     def _undefer_locateChild(self, result):
