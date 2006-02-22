@@ -25,6 +25,11 @@ class ISkinnable(inevow.IResource, inevow.IRenderer):
     Sequence of filenames to include as CSS stylesheets.
     """)
 
+class ISkin(inevow.IResource):
+    """
+    A skin that knows how to wrap generic chunks of HTML.
+    """
+
 class ISkinInfo(Interface):
     """
     Information passed to a skin.

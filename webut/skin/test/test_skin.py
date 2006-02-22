@@ -6,6 +6,7 @@ from nevow import inevow, tags, flat, context
 from webut.skin import iskin, skin
 
 class Skin(object):
+    implements(iskin.ISkin)
     def __init__(self, original):
         self.original = original
     def renderHTTP(self, ctx):
@@ -61,6 +62,7 @@ class Childish(object):
             return child(), segments[1:]
 
 class AuxFileSkin(object):
+    implements(iskin.ISkin)
     def __init__(self, original):
         self.original = original
     def renderHTTP(self, ctx):

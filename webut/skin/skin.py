@@ -62,4 +62,6 @@ class Skinner(object):
             return self.resource.renderHTTP(ctx)
         else:
             skin = self.skinFactory(self)
+            assert iskin.ISkin.providedBy(skin), \
+                   "Skin %r does not provide ISkin" % skin
             return skin.renderHTTP(ctx)

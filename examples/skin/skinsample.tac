@@ -17,6 +17,7 @@ class Content(rend.Page):
         return ctx.tag.clear()[random.choice(['Cruel', 'Sweet', ''])]
 
 class Color(rend.Page):
+    implements(iskin.ISkin)
     docFactory = loaders.xmlfile(util.sibpath(__file__, 'color-skin.html'))
 
     def data_title(self, ctx, data):
@@ -30,6 +31,7 @@ class Color(rend.Page):
         return self.original.resource
 
 class Boxed(rend.Page):
+    implements(iskin.ISkin)
     docFactory = loaders.xmlfile(util.sibpath(__file__, 'boxed-skin.html'))
 
     def data_title(self, ctx, data):
