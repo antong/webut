@@ -35,6 +35,13 @@ class ISkin(inevow.IRenderer):
     A skin that knows how to wrap generic chunks of HTML.
     """
 
+    def locateChild(self, ctx, segments):
+        """
+        Locate auxiliary files provided by the skin.
+
+        See nevow.inevow.IResource.locateChild.
+        """
+
 class ISkinInfo(Interface):
     """
     Information passed to a skin.

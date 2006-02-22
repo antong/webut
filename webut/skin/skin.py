@@ -32,12 +32,40 @@ class Skinner(object):
             return (res, segs)
 
     def locateChild(self, ctx, segments):
-        d = defer.maybeDeferred(inevow.IResource(self.resource).locateChild, ctx, segments)
-        d.addCallback(self._undefer_locateChild)
-        d.addCallback(self._cb_locateChild_1, ctx, segments)
+        """
+        Locate child resources.
+
+        First look under the skin, then under self.resource.
+
+        If skin claims a child is the skin itself, we take that to
+        mean the child should be this Skinner instance. This allows
+        skins to use nevow.rend.Page.child_ addSlash=True logic
+        without changes.
+        """
+        skin = self.skinFactory(self)
+        skinWithChildren = inevow.IResource(skin, None)
+        if skinWithChildren is not None:
+            d = defer.maybeDeferred(skinWithChildren.locateChild, ctx, segments)
+            d.addCallback(self._undefer_locateChild)
+        else:
+            d = defer.succeed((None, ()))
+        d.addCallback(self._cb_locateChild_skin, ctx, segments, skin)
         return d
 
-    def _cb_locateChild_1(self, result, ctx, segments):
+    def _cb_locateChild_skin(self, result, ctx, segments, skin):
+        res, segs = result
+        if res is not None:
+            if res is skin:
+                res = self
+            return (res, segs)
+        else:
+            d = defer.maybeDeferred(inevow.IResource(self.resource).locateChild,
+                                    ctx, segments)
+            d.addCallback(self._undefer_locateChild)
+            d.addCallback(self._cb_locateChild_content, ctx, segments)
+            return d
+
+    def _cb_locateChild_content(self, result, ctx, segments):
         res, segs = result
         if res is None:
             return (res, segs)

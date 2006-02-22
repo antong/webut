@@ -2,7 +2,7 @@ from twisted.trial import unittest
 from zope.interface import implements
 from cStringIO import StringIO
 from twisted.internet import defer
-from nevow import inevow, tags, flat, context, rend, loaders
+from nevow import inevow, tags, flat, context, rend, loaders, static
 from webut.skin import iskin, skin
 
 class Skin(object):
@@ -11,19 +11,26 @@ class Skin(object):
         self.original = original
     def rend(self, ctx, data):
         return tags.invisible['[skin]', self.original.content, '[/skin]']
+    def locateChild(self, ctx, segments):
+        return None, ()
 
 class FakeRequest(object):
+    method = 'GET'
     def __init__(self, segments):
         self.segments = segments
         self.uri = (self.prePathURL() + '/junk/junk/junk?junk=remove')
         self._written = []
         self.args = {}
+        self._sentHeaders = []
 
     def prePathURL(self):
         return 'http://fake.invalid/?junk=prepathjunk'
 
     def write(self, data):
         self._written.append(data)
+
+    def setHeader(self, header, content):
+        self._sentHeaders.append((header, content))
 
 class Xyzzy(rend.Page):
     implements(iskin.ISkinnable)
@@ -71,10 +78,11 @@ class Childish(object):
         else:
             return child(), segments[1:]
 
-class AuxFileSkin(object):
+class AuxFileSkin(rend.Page):
     implements(iskin.ISkin)
-    def __init__(self, original):
-        self.original = original
+    def __init__(self, *a, **kw):
+        super(AuxFileSkin, self).__init__(*a, **kw)
+        self.putChild('test.css', static.Data('/* not real css */', 'text/css'))
     def rend(self, ctx, data):
         return loaders.stan(tags.invisible[
             '[skin css=', self.original.pathToFiles.child('test.css'), ']',
@@ -269,6 +277,11 @@ class SkinTest(unittest.TestCase):
         def verify(got):
             self.assertEquals(got, '[skin css=http://fake.invalid/blah/test.css]topmost.[/skin]')
         d.addCallback(verify)
+
+        d.addCallback(lambda dummy: self.process(a, ['blah', 'test.css']))
+        def compare(got):
+            self.assertEquals(got, '/* not real css */')
+        d.addCallback(compare)
         return d
 
     def test_pathToFiles_one(self):
@@ -278,6 +291,11 @@ class SkinTest(unittest.TestCase):
         def verify(got):
             self.assertEquals(got, '[skin css=http://fake.invalid/blah/test.css]topmost.foo[/skin]')
         d.addCallback(verify)
+
+        d.addCallback(lambda dummy: self.process(a, ['blah', 'test.css']))
+        def compare(got):
+            self.assertEquals(got, '/* not real css */')
+        d.addCallback(compare)
         return d
 
     def test_pathToFiles_two(self):
@@ -287,4 +305,9 @@ class SkinTest(unittest.TestCase):
         def verify(got):
             self.assertEquals(got, '[skin css=http://fake.invalid/blah/test.css]topmost.foo.baz[/skin]')
         d.addCallback(verify)
+
+        d.addCallback(lambda dummy: self.process(a, ['blah', 'test.css']))
+        def compare(got):
+            self.assertEquals(got, '/* not real css */')
+        d.addCallback(compare)
         return d
