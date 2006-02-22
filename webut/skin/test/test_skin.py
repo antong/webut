@@ -268,6 +268,11 @@ class SkinTest(unittest.TestCase):
         def verify(got):
             self.assertEquals(got, '[skin css=http://fake.invalid/blah/test.css]topmost[/skin]')
         d.addCallback(verify)
+
+        d.addCallback(lambda dummy: self.process(a, ['blah', 'test.css']))
+        def compare(got):
+            self.assertEquals(got, '/* not real css */')
+        d.addCallback(compare)
         return d
 
     def test_pathToFiles_top_dir(self):
