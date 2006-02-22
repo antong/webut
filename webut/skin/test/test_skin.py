@@ -316,3 +316,14 @@ class SkinTest(unittest.TestCase):
             self.assertEquals(got, '/* not real css */')
         d.addCallback(compare)
         return d
+
+class ConfigurableLookup(unittest.TestCase):
+    def test_simple(self):
+        class Confable(rend.Page):
+            implements(iskin.ISkinnable)
+            def locateConfigurable(self, *a, **kw):
+                return ('Confable.locateConfigurable', a, kw)
+        a = Confable()
+        r = skin.DebugSkinner(Skin, a)
+        c = r.locateConfigurable('foo', name='bar')
+        self.assertEquals(c, ('Confable.locateConfigurable', ('foo',), {'name': 'bar'}))

@@ -2,6 +2,7 @@ from zope.interface import implements
 from twisted.internet import defer
 from nevow import inevow, url, tags
 from nevow.flat.twist import deferflatten
+from formless import iformless
 from webut.skin import iskin
 
 class Skinner(object):
@@ -108,6 +109,11 @@ class Skinner(object):
                     return origRenderer(ctx, name)
             self.resource.renderer = renderer
         return inevow.IResource(self.resource).renderHTTP(ctx)
+
+    def locateConfigurable(self, ctx, name):
+        """Pass locateConfigurable calls to the resource."""
+        cf = iformless.IConfigurableFactory(self.resource)
+        return cf.locateConfigurable(ctx, name)
 
 class DebugSkinner(Skinner):
     def __init__(self, *a, **kw):
