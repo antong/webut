@@ -30,7 +30,7 @@ class ISkinInfo(Interface):
     Information passed to a skin.
     """
 
-    content = Attribute("""An ISkinnable to be skinned.""")
+    resource = Attribute("""An ISkinnable to be skinned.""")
 
     pathToFiles = Attribute("""
     A nevow.url.URL that points to the topmost instance of this skin.

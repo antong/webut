@@ -9,7 +9,7 @@ class Skin(object):
     def __init__(self, foo):
         self.foo=foo
     def renderHTTP(self, ctx):
-        return tags.invisible['[skin]', self.foo.content, '[/skin]']
+        return tags.invisible['[skin]', self.foo.resource, '[/skin]']
 
 class FakeRequest(object):
     def __init__(self, segments):
@@ -65,7 +65,7 @@ class AuxFileSkin(object):
     def renderHTTP(self, ctx):
         return tags.invisible[
             '[skin css=', self.foo.pathToFiles.child('test.css'), ']',
-            self.foo.content,
+            self.foo.resource,
             '[/skin]',
             ]
 

@@ -10,10 +10,10 @@ class Skinner(object):
 
     def __init__(self,
                  skinFactory,
-                 content,
+                 resource,
                  pathToFiles=None):
         self.skinFactory = skinFactory
-        self.content = content
+        self.resource = resource
         if pathToFiles is not None:
             self.pathToFiles = pathToFiles
 
@@ -31,7 +31,7 @@ class Skinner(object):
             return (res, segs)
 
     def locateChild(self, ctx, segments):
-        d = defer.maybeDeferred(inevow.IResource(self.content).locateChild, ctx, segments)
+        d = defer.maybeDeferred(inevow.IResource(self.resource).locateChild, ctx, segments)
         d.addCallback(self._undefer_locateChild)
         d.addCallback(self._cb_locateChild_1, ctx, segments)
         return d
@@ -47,7 +47,7 @@ class Skinner(object):
             for seg in inevow.ICurrentSegments(ctx):
                 pathToFiles = pathToFiles.child(seg)
         res = self.__class__(skinFactory=self.skinFactory,
-                             content=res,
+                             resource=res,
                              pathToFiles=pathToFiles)
         return (res, segs)
 
@@ -57,9 +57,9 @@ class Skinner(object):
             for seg in inevow.ICurrentSegments(ctx):
                 pathToFiles = pathToFiles.child(seg)
             self.pathToFiles = pathToFiles
-        skinnable = iskin.ISkinnable(self.content, None)
+        skinnable = iskin.ISkinnable(self.resource, None)
         if skinnable is None:
-            return self.content.renderHTTP(ctx)
+            return self.resource.renderHTTP(ctx)
         else:
             skin = self.skinFactory(self)
             return skin.renderHTTP(ctx)
