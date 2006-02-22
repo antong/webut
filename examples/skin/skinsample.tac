@@ -9,7 +9,7 @@ class Content(rend.Page):
     implements(iskin.ISkinnable)
     addSlash = True
     docFactory = loaders.xmlfile(util.sibpath(__file__, 'content.html'),
-                                 pattern='thecontent')
+                                 pattern='skincontent')
 
     title = 'Greeting'
 
