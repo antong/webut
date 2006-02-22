@@ -80,3 +80,16 @@ class Skinner(object):
                     return origRenderer(ctx, name)
             self.resource.renderer = renderer
         return inevow.IResource(self.resource).renderHTTP(ctx)
+
+class DebugSkinner(Skinner):
+    def __init__(self, *a, **kw):
+        super(DebugSkinner, self).__init__(*a, **kw)
+        self._skinFactory = self.skinFactory
+        self.skinFactory = self.debugSkinFactory
+
+    def debugSkinFactory(self, *a, **kw):
+        skin = self._skinFactory(*a, **kw)
+        from zope.interface import verify as ziverify
+        ziverify.verifyObject(iskin.ISkin, skin)
+        iskin.ISkin.validateInvariants(skin)
+        return skin

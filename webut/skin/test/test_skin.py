@@ -156,7 +156,7 @@ class SkinTest(unittest.TestCase):
 
     def test_simple(self):
         a = Xyzzy()
-        r = skin.Skinner(Skin, a)
+        r = skin.DebugSkinner(Skin, a)
         d = self.process(r, [])
         def verify(got):
             self.assertEquals(got, '[skin]xyzzy[/skin]')
@@ -165,7 +165,7 @@ class SkinTest(unittest.TestCase):
 
     def test_deferred(self):
         a = DeferredXyzzy()
-        r = skin.Skinner(Skin, a)
+        r = skin.DebugSkinner(Skin, a)
         d = self.process(r, [])
         def verify(got):
             self.assertEquals(got, '[skin]dyddy[/skin]')
@@ -174,7 +174,7 @@ class SkinTest(unittest.TestCase):
 
     def test_childWithSkin_topmost(self):
         a = ManyXyzzys()
-        r = skin.Skinner(Skin, a)
+        r = skin.DebugSkinner(Skin, a)
         d = self.process(r, [])
         def verify(got):
             self.assertEquals(got, '[skin]topmost[/skin]')
@@ -183,7 +183,7 @@ class SkinTest(unittest.TestCase):
 
     def test_childWithSkin_one(self):
         a = ManyXyzzys()
-        r = skin.Skinner(Skin, a)
+        r = skin.DebugSkinner(Skin, a)
         d = self.process(r, ['foo'])
         def verify(got):
             self.assertEquals(got, '[skin]topmost.foo[/skin]')
@@ -192,7 +192,7 @@ class SkinTest(unittest.TestCase):
 
     def test_childWithSkin_two(self):
         a = ManyXyzzys()
-        r = skin.Skinner(Skin, a)
+        r = skin.DebugSkinner(Skin, a)
         d = self.process(r, ['foo', 'bar'])
         def verify(got):
             self.assertEquals(got, '[skin]topmost.foo.bar[/skin]')
@@ -210,7 +210,7 @@ class SkinTest(unittest.TestCase):
                 return 'mockpage'
 
         a = MockPage()
-        r = skin.Skinner(Skin, a)
+        r = skin.DebugSkinner(Skin, a)
         d = self.process(r, [])
         def verify(got):
             self.assertEquals(got, 'mockpage')
@@ -228,7 +228,7 @@ class SkinTest(unittest.TestCase):
                 return 'mockpage'
 
         a = MockPage()
-        r = skin.Skinner(Skin, a)
+        r = skin.DebugSkinner(Skin, a)
         d = self.process(r, ['thud'])
         def verify(got):
             self.assertEquals(got, '[skin]topmost[/skin]')
@@ -246,7 +246,7 @@ class SkinTest(unittest.TestCase):
                 return 'mockpage'
 
         a = MockPage()
-        r = skin.Skinner(Skin, a)
+        r = skin.DebugSkinner(Skin, a)
         d = self.process(r, ['thud', 'quux'])
         def verify(got):
             self.assertEquals(got, '[skin]topmost.quux[/skin]')
@@ -255,7 +255,7 @@ class SkinTest(unittest.TestCase):
 
     def test_pathToFiles_top(self):
         a = Childish()
-        a.child_blah = lambda : skin.Skinner(AuxFileSkin, ManyXyzzys())
+        a.child_blah = lambda : skin.DebugSkinner(AuxFileSkin, ManyXyzzys())
         d = self.process(a, ['blah'])
         def verify(got):
             self.assertEquals(got, '[skin css=http://fake.invalid/blah/test.css]topmost[/skin]')
@@ -264,7 +264,7 @@ class SkinTest(unittest.TestCase):
 
     def test_pathToFiles_top_dir(self):
         a = Childish()
-        a.child_blah = lambda : skin.Skinner(AuxFileSkin, ManyXyzzys())
+        a.child_blah = lambda : skin.DebugSkinner(AuxFileSkin, ManyXyzzys())
         d = self.process(a, ['blah', ''])
         def verify(got):
             self.assertEquals(got, '[skin css=http://fake.invalid/blah/test.css]topmost.[/skin]')
@@ -273,7 +273,7 @@ class SkinTest(unittest.TestCase):
 
     def test_pathToFiles_one(self):
         a = Childish()
-        a.child_blah = lambda : skin.Skinner(AuxFileSkin, ManyXyzzys())
+        a.child_blah = lambda : skin.DebugSkinner(AuxFileSkin, ManyXyzzys())
         d = self.process(a, ['blah', 'foo'])
         def verify(got):
             self.assertEquals(got, '[skin css=http://fake.invalid/blah/test.css]topmost.foo[/skin]')
@@ -282,7 +282,7 @@ class SkinTest(unittest.TestCase):
 
     def test_pathToFiles_two(self):
         a = Childish()
-        a.child_blah = lambda : skin.Skinner(AuxFileSkin, ManyXyzzys())
+        a.child_blah = lambda : skin.DebugSkinner(AuxFileSkin, ManyXyzzys())
         d = self.process(a, ['blah', 'foo', 'baz'])
         def verify(got):
             self.assertEquals(got, '[skin css=http://fake.invalid/blah/test.css]topmost.foo.baz[/skin]')
