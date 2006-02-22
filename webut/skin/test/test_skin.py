@@ -6,10 +6,10 @@ from nevow import inevow, tags, flat, context
 from webut.skin import iskin, skin
 
 class Skin(object):
-    def __init__(self, foo):
-        self.foo=foo
+    def __init__(self, original):
+        self.original = original
     def renderHTTP(self, ctx):
-        return tags.invisible['[skin]', self.foo.resource, '[/skin]']
+        return tags.invisible['[skin]', self.original.resource, '[/skin]']
 
 class FakeRequest(object):
     def __init__(self, segments):
@@ -61,12 +61,12 @@ class Childish(object):
             return child(), segments[1:]
 
 class AuxFileSkin(object):
-    def __init__(self, foo):
-        self.foo=foo
+    def __init__(self, original):
+        self.original = original
     def renderHTTP(self, ctx):
         return tags.invisible[
-            '[skin css=', self.foo.pathToFiles.child('test.css'), ']',
-            self.foo.resource,
+            '[skin css=', self.original.pathToFiles.child('test.css'), ']',
+            self.original.resource,
             '[/skin]',
             ]
 
