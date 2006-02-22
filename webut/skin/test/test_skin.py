@@ -321,9 +321,9 @@ class ConfigurableLookup(unittest.TestCase):
     def test_simple(self):
         class Confable(rend.Page):
             implements(iskin.ISkinnable)
-            def locateConfigurable(self, *a, **kw):
-                return ('Confable.locateConfigurable', a, kw)
+            def locateConfigurable(self, ctx, name):
+                return ('Confable.locateConfigurable', ctx, name)
         a = Confable()
         r = skin.DebugSkinner(Skin, a)
-        c = r.locateConfigurable('foo', name='bar')
-        self.assertEquals(c, ('Confable.locateConfigurable', ('foo',), {'name': 'bar'}))
+        c = r.locateConfigurable('foo', 'bar')
+        self.assertEquals(c, ('Confable.locateConfigurable', 'foo', 'bar'))
