@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:nevow="http://nevow.com/ns/nevow/0.1">
+  <head>
+    <title>Foo!</title>
+  </head>
+  <body>
+    <div nevow:render="navigation"/>
+    <p>Foo!</p>
+
+    <p>
+      I am only visible on odd IP addresses.  That is, you should see
+      me on
+      <a href="#">
+	<nevow:attr name="href" nevow:render="visible"/>
+	<span nevow:render="visible">127.0.0.1</span>
+      </a>
+      but not on
+      <a href="#">
+	<nevow:attr name="href" nevow:render="invisible"/>
+	<span nevow:render="invisible">127.0.0.2</span>
+      </a>.
+    </p>
+  </body>
+</html>
