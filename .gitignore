@@ -1,2 +1,3 @@
 _trial_temp
 *.py[co]
+/examples/navi/demoplugins/dropin.cache
