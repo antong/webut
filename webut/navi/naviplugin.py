@@ -16,6 +16,14 @@ class PluggableNavigation(object):
     - package
 
     interface should be a subclass of inavi.INavigationPlugin.
+
+
+    Child lookup results are cached, so if you use the context in
+    plug.getResource for deciding what to show, each user should
+    probably get their own Pluggable.
+
+    TODO switch to an API that makes the .getResource caching more
+    explicit -- pass something concrete to .getResource, not context.
     """
 
     interface = None
@@ -56,7 +64,10 @@ class PluggableNavigation(object):
         """
         return defer.maybeDeferred(self._getChildren, ctx)
 
+    _childCache = None
     def _getChildren(self, ctx):
+        if self._childCache is not None:
+            return self._childCache
         def f():
             plugs = self._sortChildren(self._getPlugins())
             for plug in plugs:
@@ -73,6 +84,10 @@ class PluggableNavigation(object):
                     yield name, resource
         d.addCallback(cb)
         d.addCallback(list)
+        def remember(children):
+            self._childCache = children
+            return children
+        d.addCallback(remember)
         return d
 
     def _locateChild(self, children, ctx, segments):
