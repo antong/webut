@@ -1,3 +1,10 @@
 _trial_temp
 *.py[co]
 /examples/navi/demoplugins/dropin.cache
+/build
+/debian/*.debhelper
+/debian/*.substvars
+/debian/python-webut
+/debian/python2.3-webut
+/debian/python2.4-webut
+/debian/files
