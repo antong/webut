@@ -62,7 +62,9 @@ class PluggableNavigation(object):
             for plug in plugs:
                 d = defer.maybeDeferred(plug.getResource, ctx)
                 d.addErrback(log.err)
-                d.addCallback(lambda resource: (plug.name, resource))
+                def mangle(resource, name):
+                    return (name, resource)
+                d.addCallback(mangle, plug.name)
                 yield d
         d = defer.gatherResults(list(f()))
         def cb(results):
