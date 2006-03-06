@@ -41,7 +41,7 @@ Description: Miscellaneous utilities for nevow and twisted.web{,2} programming
 
 Package: python2.4-webut
 Architecture: all
-Depends: ${python:Depends}, python2.4-twisted (>= 2.2), python2.4-twisted-web (>= 0.5), python2.4-nevow (>= 0.6)
+Depends: ${python:Depends}, python2.4-twisted-core (>= 2.2), python2.4-twisted-web (>= 0.5), python2.4-nevow (>= 0.6)
 Description: Miscellaneous utilities for nevow and twisted.web{,2} programming
  A collection of utility libraries for use when programming web
  applications with nevow, twisted.web and twisted.web2.

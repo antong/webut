@@ -25,7 +25,7 @@ Description: `python ./setup.py --description`
 
 Package: python2.4-webut
 Architecture: all
-Depends: ${python:Depends}, python2.4-twisted (>= 2.2), python2.4-twisted-web (>= 0.5), python2.4-nevow (>= 0.6)
+Depends: ${python:Depends}, python2.4-twisted-core (>= 2.2), python2.4-twisted-web (>= 0.5), python2.4-nevow (>= 0.6)
 Description: `python ./setup.py --description`
 `python ./setup.py --long-description | sed 's/^$/./; s/^/ /'`
  .
