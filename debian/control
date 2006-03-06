@@ -3,7 +3,7 @@ Section: python
 Priority: optional
 Maintainer: Tommi Virtanen <tv@debian.org>
 Standards-Version: 3.6.2
-Build-Depends-Indep: cdbs (>= 0.4.23-1.1), build-essential, debhelper (>= 4.1.0), python-dev, debhelper (>= 4.1.68), python2.3-twisted (>= 2.1)
+Build-Depends-Indep: cdbs (>= 0.4.23-1.1), build-essential, debhelper (>= 4.1.0), python-dev, debhelper (>= 4.1.68), python2.3-twisted-core (>= 2.2), python2.3-twisted-web (>= 0.5), python2.3-nevow (>= 0.6), python2.4-twisted-core (>= 2.2), python2.4-twisted-web (>= 0.5), python2.4-nevow (>= 0.6)
 
 Package: python-webut
 Architecture: all
